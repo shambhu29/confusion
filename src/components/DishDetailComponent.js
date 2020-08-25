@@ -3,7 +3,7 @@ import { Card, CardImg, CardBody, CardText, CardTitle, Breadcrumb, BreadcrumbIte
 import { Link } from 'react-router-dom';
 
     function RenderDishDetails({ dish, comments}) {
-        console.log(dish);
+        
         const _comments = comments.map((comment) => {
             return (
                 <div key={ comment.id }>
