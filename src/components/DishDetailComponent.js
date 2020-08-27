@@ -1,67 +1,187 @@
-import React from 'react';
-import { Card, CardImg, CardBody, CardText, CardTitle, Breadcrumb, BreadcrumbItem } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import React, { Component } from "react";
+import {
+  Card,
+  CardImg,
+  CardBody,
+  CardText,
+  CardTitle,
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  Label,
+  Row,
+} from "reactstrap";
+import { Link } from "react-router-dom";
+import { LocalForm, Control, Errors } from "react-redux-form";
 
-    function RenderDishDetails({ dish, comments}) {
-        
-        const _comments = comments.map((comment) => {
-            return (
-                <div key={ comment.id }>
-                    <CardText>{ comment.comment }</CardText>
-                    <CardText>-- { comment.author } , { new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format( new Date( Date.parse(comment.date) )) } <br/><br/> </CardText>                        
-                </div>
-            )
-        });
+const required = (val) => val && val.length;
+const minLength = (len) => (val) => val && val.length >= len;
+const maxLength = (len) => (val) => !val || val.length <= len;
 
-        return (
-          <div className="row">
-            <div className="col-12 col-md-5 m-1">
-              <Card>
-                <CardImg width="100%" src={dish.image} alt={dish.name} />
-                <CardBody>
-                  <CardTitle>{ dish.name }</CardTitle>
-                  <CardText>{ dish.description }</CardText>
-                </CardBody>
-              </Card>
-            </div>
-            <div className="col-12 col-md-5 m-1">
-              <Card>
-                <CardBody>
-                  <CardTitle>Comments</CardTitle>
-                  { _comments }
-                </CardBody>
-              </Card>
-            </div>
-          </div>
-        );
-    }                
+function RenderDishDetails({ dish, comments }) {
+  class CommentForm extends Component {
+    constructor(props) {
+      super(props);
 
-    const DishDetail = (props) => {
-        console.log(props);
-        if (props.dish != null) {
-            return(
-                <div>
-                  <div className="row">
-                    <Breadcrumb>                        
-                        <BreadcrumbItem><Link to="/menu">Menu</Link></BreadcrumbItem>
-                        <BreadcrumbItem active>{ props.dish.name }</BreadcrumbItem>
-                    </Breadcrumb>
-                    <div className="col-12">
-                        <h3>{ props.dish.name }</h3>
-                        <hr />
-                    </div>
-                </div>
-                  <RenderDishDetails 
-                    dish={ props.dish }
-                    comments={ props.comments }
-                  />
-                </div>
-            );
-        } else {
-           return(
-               <div></div>
-           ) 
-        }        
+      this.state = {
+        isModalOpen: false,
+      };
+
+      this.toggleModal = this.toggleModal.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
     }
+
+    toggleModal() {
+      this.setState({ isModalOpen: !this.state.isModalOpen });
+    }
+
+    handleSubmit(values) {
+      this.toggleModal();
+      alert("Current State:" + JSON.stringify(values));
+    }
+
+    render() {
+      return (
+        <div>
+          <Button
+            outline
+            color="secondary"
+            type="button"
+            onClick={this.toggleModal}
+          >
+            <span className="fa fa-pencil fa-lg"> Submit Comment</span>
+          </Button>
+          <Modal isOpen={this.state.isModalOpen} toggleModal={this.toggleModal}>
+            <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
+            <ModalBody>
+              <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
+                <Row className="form-group">
+                  <Label htmlFor="rating">Rating</Label>
+                  <Control.select
+                    model=".rating"
+                    className="form-control"
+                    name="rating"
+                  >
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </Control.select>
+                </Row>
+                <Row className="form-group">
+                  <Label htmlFor="rating">Your Name</Label>
+                  <Control.text
+                    className="form-control"
+                    model=".name"
+                    id="name"
+                    name="name"
+                    validators={{
+                      required,
+                      minLength: minLength(3),
+                      maxLength: maxLength(15),
+                    }}
+                  />
+                  <Errors
+                    className="text-danger"
+                    model=".name"
+                    show="touched"
+                    messages={{
+                      required: "Required",
+                      minLength: "Must be greater than 2 characters",
+                      maxLength: "Must be 15 characters or less",
+                    }}
+                  />
+                </Row>
+                <Row className="form-group">
+                  <Label htmlFor="rating">Comment</Label>
+                  <Control.textarea
+                    className="form-control"
+                    model=".comment"
+                    id="comment"
+                    name="comment"
+                    rows="6"
+                  />
+                </Row>
+                <Button type="submit" value="submit" className="bg-primary">
+                  Submit
+                </Button>
+              </LocalForm>
+            </ModalBody>
+          </Modal>
+        </div>
+      );
+    }
+  }
+
+  const _comments = comments.map((comment) => {
+    return (
+      <div key={comment.id}>
+        <CardText>{comment.comment}</CardText>
+        <CardText>
+          -- {comment.author} ,{" "}
+          {new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          }).format(new Date(Date.parse(comment.date)))}{" "}
+          <br />
+          <br />{" "}
+        </CardText>
+      </div>
+    );
+  });
+
+  return (
+    <div className="row">
+      <div className="col-12 col-md-5 m-1">
+        <Card>
+          <CardImg width="100%" src={dish.image} alt={dish.name} />
+          <CardBody>
+            <CardTitle>{dish.name}</CardTitle>
+            <CardText>{dish.description}</CardText>
+          </CardBody>
+        </Card>
+      </div>
+      <div className="col-12 col-md-5 m-1">
+        <Card>
+          <CardBody>
+            <CardTitle>Comments</CardTitle>
+            {_comments}
+            <CommentForm />
+          </CardBody>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+const DishDetail = (props) => {
+  console.log(props);
+  if (props.dish != null) {
+    return (
+      <div>
+        <div className="row">
+          <Breadcrumb>
+            <BreadcrumbItem>
+              <Link to="/menu">Menu</Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
+          </Breadcrumb>
+          <div className="col-12">
+            <h3>{props.dish.name}</h3>
+            <hr />
+          </div>
+        </div>
+        <RenderDishDetails dish={props.dish} comments={props.comments} />
+      </div>
+    );
+  } else {
+    return <div></div>;
+  }
+};
 
 export default DishDetail;
