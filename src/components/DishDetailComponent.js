@@ -39,7 +39,12 @@ class CommentForm extends Component {
 
   handleSubmit(values) {
     this.toggleModal();
-    alert("Current State:" + JSON.stringify(values));
+    this.props.addComment(
+      this.props.dishId,
+      values.rating,
+      values.author,
+      values.comment
+    );
   }
 
   render() {
@@ -72,10 +77,10 @@ class CommentForm extends Component {
                 </Control.select>
               </Row>
               <Row className="form-group">
-                <Label htmlFor="rating">Your Name</Label>
+                <Label htmlFor="author">Your Name</Label>
                 <Control.text
                   className="form-control"
-                  model=".name"
+                  model=".author"
                   id="name"
                   name="name"
                   validators={{
@@ -86,7 +91,7 @@ class CommentForm extends Component {
                 />
                 <Errors
                   className="text-danger"
-                  model=".name"
+                  model=".author"
                   show="touched"
                   messages={{
                     required: "Required",
@@ -116,7 +121,7 @@ class CommentForm extends Component {
   }
 }
 
-function RenderDishDetails({ dish, comments }) {
+function RenderDishDetails({ dish, comments, addComment, dishId }) {
   const _comments = comments.map((comment) => {
     return (
       <div key={comment.id}>
@@ -151,7 +156,7 @@ function RenderDishDetails({ dish, comments }) {
           <CardBody>
             <CardTitle>Comments</CardTitle>
             {_comments}
-            <CommentForm />
+            <CommentForm addComment={addComment} dishId={dishId} />
           </CardBody>
         </Card>
       </div>
@@ -175,7 +180,12 @@ const DishDetail = (props) => {
             <hr />
           </div>
         </div>
-        <RenderDishDetails dish={props.dish} comments={props.comments} />
+        <RenderDishDetails
+          dish={props.dish}
+          comments={props.comments}
+          addComment={props.addComment}
+          dishId={props.dish.id}
+        />
       </div>
     );
   } else {
