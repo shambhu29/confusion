@@ -13,15 +13,20 @@ export const Dishes = (
       return {
         ...state,
         isLoading: false,
-        errMss: null,
+        errMess: null,
         dishes: action.payload,
       };
 
     case ActionTypes.DISHES_LOADING:
-      return { ...state, isLoading: true, errMss: null, dishes: [] };
+      return { ...state, isLoading: true, errMess: null, dishes: [] };
 
     case ActionTypes.DISHES_FAILED:
-      return { ...state, isLoading: false, errMss: action.payload, dishes: [] };
+      return {
+        ...state,
+        isLoading: false,
+        errMess: action.payload,
+        dishes: [],
+      };
 
     default:
       return state;
