@@ -189,7 +189,6 @@ function RenderDishDetails({
 }
 
 const DishDetail = (props) => {
-  console.log(props);
   if (props.isLoading) {
     return (
       <div className="container">
